@@ -1,0 +1,12 @@
+dockerfile
+dockerfile
+infra
+
+node_modules
+.env
+*.log
+.DS_Store
+*.swp
+coverage/
+dist/
+build/

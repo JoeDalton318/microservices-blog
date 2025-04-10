@@ -1,0 +1,64 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      # Client React (Frontend) - Route par défaut
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: client-srv
+            port:
+              number: 3000
+
+      # Posts Service
+      - path: /posts/create
+        pathType: Exact
+        backend:
+          service:
+            name: posts-clusterip-srv
+            port:
+              number: 4000
+
+      # Query Service
+      - path: /posts
+        pathType: Exact
+        backend:
+          service:
+            name: query-srv
+            port:
+              number: 4002
+
+      # Comments Service
+      - path: /posts/([^/]+)/comments
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: comments-srv
+            port:
+              number: 4001
+
+      # Routes internes (optionnelles)
+      - path: /moderation
+        pathType: Prefix
+        backend:
+          service:
+            name: moderation-srv
+            port:
+              number: 4003
+      - path: /events
+        pathType: Prefix
+        backend:
+          service:
+            name: event-bus-srv
+            port:
+              number: 4005
